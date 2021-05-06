@@ -22,7 +22,7 @@ class ApplicationTest extends AnyFlatSpec {
   }
 
   "Counting words in a list of events" should "produce the correct result" in {
-    val res = Application.countEvents(testEvents)
+    val res = Application.countWords(testEvents)
     res.size shouldBe 3
     res.get("cheese") shouldBe Some(3)
     res.get("pineapple") shouldBe Some(2)
