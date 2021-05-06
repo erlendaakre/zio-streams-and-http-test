@@ -21,6 +21,14 @@ class ApplicationTest extends AnyFlatSpec {
     Application.makeEvent(str) shouldBe Some(Event("baz", "foo", 1620215144))
   }
 
+  "Counting words in a list of events" should "produce the correct result" in {
+    val res = Application.countEvents(testEvents)
+    res.size shouldBe 3
+    res.get("cheese") shouldBe Some(3)
+    res.get("pineapple") shouldBe Some(2)
+    res.get("broccoli") shouldBe Some(1)
+  }
+
   "Grouping events" should "produce a map of EventTypes to List of Event" in  {
     val grouped = Application.groupEvents(testEvents)
     grouped.keySet should contain allOf("foo", "bar", "baz")
