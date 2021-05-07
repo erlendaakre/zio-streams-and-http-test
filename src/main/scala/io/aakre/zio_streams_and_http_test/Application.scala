@@ -5,30 +5,25 @@ import zhttp.service.Server
 import zio.console.putStrLn
 import zio.json.{DecoderOps, DeriveJsonDecoder, JsonDecoder}
 import zio.process.Command
-import zio.stream.ZSink
-import zio.{ExitCode, URIO, ZIO}
+import zio.{ExitCode, Ref, URIO, ZIO}
 
 object Application extends zio.App {
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] = prog.exitCode
 
-  private val blackBox = Command("blackbox.win.exe").linesStream
-  private val eventStream = blackBox.map(makeEvent).filter(_.nonEmpty).map(_.get)
+  private val state = zio.Runtime.default.unsafeRun(Ref.make(0)) // (╯°□°）╯︵ ┻━┻
 
-  private val sink = ZSink.collectAll[Event] // TODO: how to access stream in webApp???
+  private val blackBox = Command("blackbox.win.exe").linesStream
+  private val eventStream = blackBox.map(makeEvent).filter(_.nonEmpty).map(_.get).tap(e => putStrLn(e.toString))
+  private val streamEventsToState = eventStream.foreach(event => state.set(event.timestamp.toInt))
 
   private val webApp = Http.collectM[Request] {
     case Method.GET -> Root =>
-      for {
-        x        <- ZIO.succeed(-1)
-        // y     <- sink.map(chunk => chunk.size) // TODO: any way to get the sink contents as a ZIO?
-        response <- ZIO.succeed(Response.text(s"Time: ${System.currentTimeMillis()}\nEvents: $x"))
-      } yield response
+      state.get.flatMap(s =>
+        ZIO.succeed(Response.text(s"Time: ${System.currentTimeMillis()}\nEvents: $s"))
+      )
   }
 
-  private val prog = for {
-    _ <- putStrLn("Starting Server")
-    s <- Server.start(8090, webApp).zipPar(eventStream.tap(e => putStrLn(e.toString)).run(sink))
-  } yield s
+  private val prog = Server.start(8090, webApp).zipPar(streamEventsToState.run)
 
   type EventType = String
   type Word = String
