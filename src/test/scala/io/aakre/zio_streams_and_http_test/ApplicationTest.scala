@@ -1,8 +1,7 @@
 package io.aakre.zio_streams_and_http_test
 
-import io.aakre.zio_streams_and_http_test.models._
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.must.Matchers.{contain, defined}
+import org.scalatest.matchers.must.Matchers.defined
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
 class ApplicationTest extends AnyFlatSpec {

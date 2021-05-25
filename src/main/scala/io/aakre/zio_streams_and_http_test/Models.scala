@@ -1,4 +1,4 @@
-package io.aakre.zio_streams_and_http_test.models
+package io.aakre.zio_streams_and_http_test
 
 import zio.json.{DeriveJsonDecoder, DeriveJsonEncoder, JsonDecoder, JsonEncoder}
 
