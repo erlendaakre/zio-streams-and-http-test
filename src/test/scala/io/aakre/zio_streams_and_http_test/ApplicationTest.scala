@@ -33,4 +33,23 @@ class ApplicationTest extends AnyFlatSpec {
     res.wordCount.find(p => p == ResultForType("bar", Map("pineapple" -> 2))) shouldBe defined
     res.wordCount.find(p => p == ResultForType("foo", Map("broccoli" -> 1))) shouldBe defined
   }
+
+  "Counting words from a certain time " should "produce the correct results" in {
+    val res = Application.countWords(testEvents, 4)
+    res.wordCount.size shouldBe 2
+    res.wordCount.find(p => p == ResultForType("bar", Map("pineapple" -> 2))) shouldBe defined
+    res.wordCount.find(p => p == ResultForType("foo", Map("broccoli" -> 1))) shouldBe defined
+  }
+  "Counting words before a certain time " should "produce the correct results" in {
+    val res = Application.countWords(testEvents, 0, 4)
+    res.wordCount.size shouldBe 2
+    res.wordCount.find(p => p == ResultForType("baz", Map("cheese" -> 3))) shouldBe defined
+    res.wordCount.find(p => p == ResultForType("bar", Map("pineapple" -> 1))) shouldBe defined
+  }
+  "Counting words in an interval " should "produce the correct results" in {
+    val res = Application.countWords(testEvents, 3, 5)
+    res.wordCount.size shouldBe 2
+    res.wordCount.find(p => p == ResultForType("baz", Map("cheese" -> 1))) shouldBe defined
+    res.wordCount.find(p => p == ResultForType("bar", Map("pineapple" -> 2))) shouldBe defined
+  }
 }
