@@ -13,5 +13,5 @@ Simple app for trying out zio-streams and zio-http
 
 ## TODO
 - Fix broken use of REF with mutable collection
-- Use zlayers to separate http and event processing
+- Use zlayers for separating http / event processing and handling dependencies
 - improve `webApp`, Option use looks ugly, deduplicate param handling?
