@@ -1,6 +1,6 @@
 package io.aakre.zio_streams_and_http_test
 
-import io.aakre.zio_streams_and_http_test.Application.Event
+import io.aakre.zio_streams_and_http_test.Application.{Event, ResultForType}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers.{contain, defined}
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
@@ -21,19 +21,16 @@ class ApplicationTest extends AnyFlatSpec {
     Application.makeEvent(str) shouldBe Some(Event("baz", "foo", 1620215144))
   }
 
+  "A Result" should "produce the expected json" in {
+    import zio.json.EncoderOps
+    ResultForType("baz", Map("cheese" -> 3)).toJson shouldBe "{\"type\":\"baz\",\"count\":{\"cheese\":3}}"
+  }
+
   "Counting words in a list of events" should "produce the correct result" in {
     val res = Application.countWords(testEvents)
-    res.size shouldBe 3
-    res.get("cheese") shouldBe Some(3)
-    res.get("pineapple") shouldBe Some(2)
-    res.get("broccoli") shouldBe Some(1)
+    res.wordCount.size shouldBe 3
+    res.wordCount.find(p => p == ResultForType("baz", Map("cheese" -> 3))) shouldBe defined
+    res.wordCount.find(p => p == ResultForType("bar", Map("pineapple" -> 2))) shouldBe defined
+    res.wordCount.find(p => p == ResultForType("foo", Map("broccoli" -> 1))) shouldBe defined
   }
-
-  "Grouping events" should "produce a map of EventTypes to List of Event" in  {
-    val grouped = Application.groupEvents(testEvents)
-    grouped.keySet should contain allOf("foo", "bar", "baz")
-    grouped("bar").size shouldBe 2
-    grouped("bar").head.data shouldBe "pineapple"
-  }
-
 }
