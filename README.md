@@ -12,7 +12,7 @@ Simple app for trying out zio-streams and zio-http
 - `http://localhost:8090/between/$timestamp1/$timestamp2` to count events between $timestamp1 and $timestamp2
 
 ## TODO
-- Fix broken use of REF with mutable collection
+- Fix broken use of REF!
 - Optimise memory usage of stored events (ZStream, ZTransducer?) 
 - Use zlayers for separating http / event processing and handling dependencies
 - improve `webApp`, Option use looks ugly, deduplicate param handling?

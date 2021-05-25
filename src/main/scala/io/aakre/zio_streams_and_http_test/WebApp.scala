@@ -5,12 +5,11 @@ import zhttp.http.{Http, Method, Request, Response, _}
 import zio.json.EncoderOps
 import zio.{Ref, ZIO}
 
-import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
 object WebApp {
 
-  def apply(state: Ref[ListBuffer[Event]]): Http[Any, HttpError, Request, Response] = Http.collectM[Request] {
+  def apply(state: Ref[List[Event]]): Http[Any, HttpError, Request, Response] = Http.collectM[Request] {
     case Method.GET -> Root =>
       state.get.flatMap(events => ZIO.succeed(Response.jsonString(countWords(events).toJsonPretty)))
 
