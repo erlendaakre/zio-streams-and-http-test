@@ -11,15 +11,12 @@ import zio.{ExitCode, Ref, URIO, ZIO}
 object Application extends zio.App {
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] = prog.exitCode
 
-  // FIXME (╯°□°）╯︵ ┻━┻
+  // FIXME: Zionomicon pg 150             (╯°□°）╯︵ `unsafeRun`
   private val state = zio.Runtime.default.unsafeRun(Ref.make(collection. mutable.ListBuffer.empty[Event]))
 
   private val blackBox = Command("blackbox.win.exe").linesStream
   private val eventStream = blackBox.map(makeEvent).filter(_.nonEmpty).map(_.get).tap(e => putStrLn(e.toString))
-  private val streamEventsToState = eventStream.foreach(event => for {
-    s <- state.get
-    _ <- state.set(s += event)
-  } yield ())
+  private val streamEventsToState = eventStream.foreach(event => state.update(_ += event))
 
   private val webApp = Http.collectM[Request] {
     case Method.GET -> Root =>
