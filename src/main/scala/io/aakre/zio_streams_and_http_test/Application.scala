@@ -14,7 +14,7 @@ object Application extends zio.App {
 
   private val blackBox = Command("blackbox.win.exe").linesStream
   private val eventStream = blackBox.map(makeEvent).filter(_.nonEmpty).map(_.get).tap(e => putStrLn(e.toString))
-  private val streamEventsToState = eventStream.foreach(event => state.update(_ += event))
+  private val streamEventsToState = eventStream.foreach(event => state.modify(es => ((), es += event)))
   private val webApp = WebApp(state)
 
   private val prog = Server.start(8090, webApp) zipPar streamEventsToState.run
